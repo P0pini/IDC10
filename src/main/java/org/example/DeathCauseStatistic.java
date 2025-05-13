@@ -1,6 +1,8 @@
 package org.example;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,9 +64,26 @@ public class DeathCauseStatistic {
         }
         public void repopulate(String csvFile){
             statistics.clear();
-            try(BufferedReader){
-
+            try(BufferedReader reader = new BufferedReader(new FileReader(csvFile))){
+                String line;
+                while ((line=reader.readLine())!=null){
+                    if(line.trim().isEmpty()||line.startsWith("Kod")){
+                        continue;
+                    }
+                    try{
+                        DeathCauseStatistic stat =DeathCauseStatistic.fromCsvLine(line);
+                        statistics.add(stat);
+                    }catch(IllegalArgumentException e){
+                        System.err.println("Błąd w linii: "+line);
+                    }
+                }
+            }catch (IOException e){
+                System.err.println("Błąd podczas czytania pliku");
+                e.printStackTrace();
             }
+        }
+        public List<DeathCauseStatistic> getStatistics(){
+            return statistics;
         }
 
     }
